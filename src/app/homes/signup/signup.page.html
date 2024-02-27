@@ -1,0 +1,105 @@
+<ion-content [fullscreen]="true">
+  <ion-spinner
+    class="ion-text-center"
+    name="crescent"
+    color="success"
+    *ngIf="isLoading"
+  ></ion-spinner>
+  <div class="circleBase type2 circle1"></div>
+  <div class="circleBase type1"></div>
+  <div class="circleBase type2 circle2"></div>
+
+  <ion-label class="welcomeMessage">
+    <ion-text color="light">Hello,</ion-text>
+    <ion-text color="light">
+      <p>Sign Up!</p>
+    </ion-text>
+  </ion-label>
+
+  <ion-icon
+    name="arrow-back-outline"
+    color="light"
+    class="backButton"
+    routerLink="/home"
+  >
+  </ion-icon>
+
+  <form [formGroup]="signupForm">
+    <ion-list lines="none" class="ion-margin ion-padding ion-text-center">
+      <ion-item class="ion-margin-vertical">
+        <ion-icon name="person-outline" slot="end" color="medium"> </ion-icon>
+        <ion-input
+          formControlName="username"
+          placeholder="Enter Username"
+          autocomplete="off"
+        >
+        </ion-input>
+      </ion-item>
+      <ion-text
+        class="ion-text-left"
+        color="danger"
+        *ngIf="!signupForm.get('username')&& signupForm.get('username')?.touched"
+      >
+        <p class="error">*Please enter Username</p>
+      </ion-text>
+
+      <ion-item class="ion-margin-vertical">
+        <ion-icon name="mail-outline" slot="end" color="medium"> </ion-icon>
+        <ion-input
+          formControlName="email"
+          placeholder="Enter Email Address"
+          autocomplete="off"
+        >
+        </ion-input>
+      </ion-item>
+      <ion-text
+        class="ion-text-left"
+        color="danger"
+        *ngIf="!signupForm.get('email') && signupForm.get('email')"
+      >
+        <p class="error">*Please enter proper Email Address</p>
+      </ion-text>
+
+      <ion-item class="ion-margin-vertical">
+        <ion-icon
+          (click)="onChange()"
+          [name]="isTypePassword ? 'lock-closed-outline' : 'lock-open-outline'"
+          slot="end"
+          [color]="isTypePassword ? 'medium' : 'primary'"
+        >
+        </ion-icon>
+        <ion-input
+          formControlName="password"
+          [type]="isTypePassword ? 'password' : 'text'"
+          placeholder="Enter Password"
+          autocomplete="off"
+        >
+        </ion-input>
+      </ion-item>
+      <ion-text
+        class="ion-text-left"
+        color="danger"
+        *ngIf="!signupForm.get('password')?.invalid && signupForm.get('password')"
+      >
+        <p
+          class="error"
+          *ngIf="signupForm.get('password')?.invalid && signupForm.get('password') && signupForm.get('password')?.errors?.['required']"
+        ></p>
+
+        <p class="error" *ngIf="signupForm.get('password')?.dirty"></p>
+      </ion-text>
+
+      <ion-row class="ion-margin-vertical">
+        <ion-col size="12" class="alignItems">
+          <div align="left">
+            <ion-checkbox></ion-checkbox>
+            <ion-note>I accept the policy and terms</ion-note>
+          </div>
+        </ion-col>
+      </ion-row>
+      <ion-button color="primary" shape="round" (click)="onSubmit()"
+        >Sign Up</ion-button
+      >
+    </ion-list>
+  </form>
+</ion-content>
