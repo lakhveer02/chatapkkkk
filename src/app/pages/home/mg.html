@@ -1,0 +1,672 @@
+<ion-header class="title-header">
+  <mat-toolbar color="primary">
+    <title>Chat</title>
+    <button slot="end">
+      <button fill="clear" id="popover">
+        <mat-icon>menu</mat-icon>
+      </button>
+    </button>
+    <mat-popover #popover trigger="popover" triggerAction="click">
+      <ng-template>
+        <ng-content class="ion-padding ion-text-center" (click)="logout()">
+          <mat-label color="danger">LOGOUT</mat-label>
+        </ng-content>
+      </ng-template>
+    </mat-popover>
+  </mat-toolbar>
+  <mat-segment
+    [value]="segment"
+    mode="md"
+    (ionChange)="onSegmentChanged($event)"
+  >
+    <button value="status">
+      <mat-label>Status</mat-label>
+    </button>
+    <button value="chats">
+      <mat-label>Chats</mat-label>
+    </button>
+    <button value="calls">
+      <mat-label>Calls</mat-label>
+    </button>
+  </mat-segment>
+</ion-header>
+
+<ion-content>
+  <mat-list *ngIf="segment === 'chats' && (chatRooms$ | async) as rooms">
+    <mat-list-item class="ion-padding-bottom" color="light"
+      >RECENT CHATS</mat-list-item
+    >
+
+    <app-empty-screen
+      *ngIf="rooms.length===0"
+      [model]="model"
+    ></app-empty-screen>
+    <mat-list-item
+      *ngFor="let item of rooms"
+      (click)="getChat(item)"
+      [detail]="true"
+    >
+      <ng-container *ngIf="item">
+        <mat-card-avatar slot="start">
+          <img [src]="getUser(item)?.photo" />
+        </mat-card-avatar>
+        <mat-label>{{getUser(item)?.name}}</mat-label>
+      </ng-container>
+    </mat-list-item>
+  </mat-list>
+
+  <mat-list *ngIf="segment=== 'status'">
+    <mat-list-item color="light">
+      <mat-label>Status Updates</mat-label>
+    </mat-list-item>
+    <mat-list-item *ngFor="let status of statusList$ | async">
+      <ng-container *ngIf="status">
+        <mat-card-avatar slot="start">
+          <img [src]="status.photo" />
+        </mat-card-avatar>
+        <mat-label>{{status.userName}} </mat-label>
+
+        <h5>{{status?.status}}</h5>
+      </ng-container>
+    </mat-list-item>
+  </mat-list>
+
+  <mat-list *ngIf="segment==='calls'">
+    <mat-list-item>
+      <mat-label>Call 1</mat-label>
+
+      <ng-content>
+        <mat-list>
+          <video #localVideo autoplay playsinline muted></video>
+        </mat-list>
+        <mat-list>
+          <video #remoteVideo autoplay playsinline></video>
+        </mat-list>
+      </ng-content>
+    </mat-list-item>
+  </mat-list>
+
+  <mat-feb
+    slot="fixed"
+    horizontal="end"
+    vertical="bottom"
+    *ngIf="segment==='chats'"
+  >
+    <button (click)="newChat()">
+      <mat-icon>person-add-outline</mat-icon>
+    </button>
+  </mat-feb>
+  <mat-modal
+    #new_chat
+    [isOpen]="open_new_chat"
+    (willDismiss)="onWillDismiss($event)"
+  >
+    <ng-template>
+      <header>
+        <mat-toolbar color="primary">
+          <title>New Chat</title>
+          <button slot="end">
+            <button (click)="cancel()">Cancel</button>
+          </button>
+        </mat-toolbar>
+      </header>
+      <ng-content color="light" *ngIf="(user | async) as user$">
+        <mat-list
+          class="ion-margin-top"
+          [style.background]="'transparent'"
+          lines="none"
+        >
+          <app-userlist
+            *ngFor="let item of user$"
+            [item]="item"
+            (onClick)="startChat($event)"
+          ></app-userlist>
+        </mat-list>
+      </ng-content>
+    </ng-template>
+  </mat-modal>
+
+  <mat-feb
+    slot="fixed"
+    horizontal="end"
+    vertical="bottom"
+    *ngIf="segment==='status'"
+  >
+    <button (click)="status()">
+      <mat-icon>add-circle</mat-icon>
+    </button>
+  </mat-feb>
+
+  <mat-modal
+    #statusModal
+    [isOpen]="open_new_status"
+    (willDismiss)="onStatusModalDismiss($event)"
+  >
+    <ng-template>
+      <header>
+        <mat-toolbar color="primary">
+          <title>Update Status</title>
+          <button slot="end">
+            <button (click)="cancelStatusUpdate()"></button>
+          </button>
+        </mat-toolbar>
+      </header>
+      <ng-content color="light">
+        <mat-list-item>
+          <mat-label>New Status</mat-label>
+          <mat-textarea
+            [(ngModel)]="newStatus"
+            rows="4"
+            placeholder="Enter your new status here"
+          ></mat-textarea>
+        </mat-list-item>
+        <button (click)="takePicture()">Take Picture</button>
+        <button (click)="uploadStatus(newStatus)">Upload Status</button>
+      </ng-content>
+    </ng-template>
+  </mat-modal>
+</ion-content>
+<ion-header class="title-header">
+  <ion-toolbar color="primary">
+    <ion-title>Chat</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" id="popover">
+        <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-popover #popover trigger="popover" triggerAction="click">
+      <ng-template>
+        <ion-content class="ion-padding ion-text-center" (click)="logout()">
+          <ion-label color="danger"> LOGOUT </ion-label>
+        </ion-content>
+      </ng-template>
+    </ion-popover>
+  </ion-toolbar>
+  <ion-segment
+    [value]="segment"
+    mode="md"
+    (ionChange)="onSegmentChanged($event)"
+  >
+    <ion-segment-button value="status">
+      <ion-label>Status</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="chats">
+      <ion-label>Chats</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="calls">
+      <ion-label>Calls</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+</ion-header>
+
+<ion-content color="light">
+  <ion-list *ngIf="segment === 'chats' && (chatRooms$ | async) as rooms">
+    <ion-list-header class="ion-padding-bottom" color="light">
+      RECENT CHATS
+    </ion-list-header>
+    <app-empty-screen
+      *ngIf="rooms.length === 0"
+      [model]="model"
+    ></app-empty-screen>
+    <ion-item
+      *ngFor="let item of rooms"
+      (click)="getChat(item)"
+      [detail]="true"
+    >
+      <ng-container *ngIf="item">
+        <ion-avatar slot="start">
+          <img [src]="getUser(item)?.photo" />
+        </ion-avatar>
+        <ion-label>{{ getUser(item)?.name }} </ion-label>
+      </ng-container>
+    </ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="segment ==='status' ">
+    <ion-list-header color="light">
+      <ion-label> Status Updates</ion-label>
+    </ion-list-header>
+    <ion-item *ngFor="let status of statusList$ | async">
+      <ng-container *ngIf="status">
+        <ion-avatar slot="start">
+          <img [src]="status.photo" />
+        </ion-avatar>
+        <ion-label>{{status.userName}} </ion-label>
+
+        <h5>{{status?.status}}</h5>
+      </ng-container>
+    </ion-item>
+  </ion-list>
+
+  <!--suppress HtmlUnknownTag, HtmlUnknownTag -->
+  <ion-list *ngIf="segment === 'calls'">
+    <ion-item>
+      <ion-label>Call 1</ion-label>
+      <!-- <ion-header>
+        <ion-toolbar>
+          <ion-title> video call </ion-title>
+        </ion-toolbar>
+      </ion-header> -->
+      <ion-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <video #localVideo autoplay playsinline muted></video>
+            </ion-col>
+            <ion-col>
+              <video #remoteVideo autoplay playsinline></video>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-content>
+    </ion-item>
+  </ion-list>
+
+  <ion-fab
+    slot="fixed"
+    horizontal="end"
+    vertical="bottom"
+    *ngIf="segment === 'chats'"
+  >
+    <ion-fab-button (click)="newChat()">
+      <ion-icon name="person-add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <ion-modal
+    #new_chat
+    [isOpen]="open_new_chat"
+    (willDismiss)="onWillDismiss($event)"
+  >
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>New Chat</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cancel()">Cancel</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content color="light" *ngIf="(users | async) as user$">
+        <ion-list
+          class="ion-margin-top"
+          [style.background]="'transparent'"
+          lines="none"
+        >
+          <app-userlist
+            *ngFor="let item of user$"
+            [item]="item"
+            (onClick)="startChat($event)"
+          >
+          </app-userlist>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+  <ion-fab
+    slot="fixed"
+    horizontal="end"
+    vertical="bottom"
+    *ngIf="segment === 'status'"
+  >
+    <ion-fab-button (click)="status()">
+      <ion-icon name="add-circle-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-modal
+    #statusModal
+    [isOpen]="open_new_status"
+    (willDismiss)="onStatusModalDismiss($event)"
+  >
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Update Status</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cancelStatusUpdate()">Cancel</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content color="light">
+        <ion-item>
+          <label>New Status</label>
+          <ion-textarea
+            [(ngModel)]="newStatus"
+            rows="4"
+            placeholder="Enter your new status here"
+          ></ion-textarea>
+        </ion-item>
+        <ion-button (click)="takePicture()">Take Picture</ion-button>
+        <ion-button (click)="uploadStatus(newStatus)">Upload Status</ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
+
+<ion-header class="title-header">
+  <ion-toolbar color="primary">
+    <ion-title>Chat</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" id="popover">
+        <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-popover #popover trigger="popover" triggerAction="click">
+      <ng-template>
+        <ion-content class="ion-padding ion-text-center" (click)="logout()">
+          <ion-label color="danger"> LOGOUT </ion-label>
+        </ion-content>
+      </ng-template>
+    </ion-popover>
+  </ion-toolbar>
+  <ion-segment
+    [value]="segment"
+    mode="md"
+    (ionChange)="onSegmentChanged($event)"
+  >
+    <ion-segment-button value="status">
+      <ion-label>Status</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="chats">
+      <ion-label>Chats</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="calls">
+      <ion-label>Calls</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+</ion-header>
+
+<ion-content color="light">
+  <ion-list *ngIf="segment === 'chats' && (chatRooms$ | async) as rooms">
+    <ion-list-header class="ion-padding-bottom" color="light">
+      RECENT CHATS
+    </ion-list-header>
+    <app-empty-screen
+      *ngIf="rooms.length === 0"
+      [model]="model"
+    ></app-empty-screen>
+    <ion-item
+      *ngFor="let item of rooms"
+      (click)="getChat(item)"
+      [detail]="true"
+    >
+      <ng-container *ngIf="item">
+        <ion-avatar slot="start">
+          <img [src]="getUser(item)?.photo" />
+        </ion-avatar>
+        <ion-label>{{ getUser(item)?.name }} </ion-label>
+      </ng-container>
+    </ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="segment ==='status' ">
+    <ion-list-header color="light">
+      <ion-label> Status Updates</ion-label>
+    </ion-list-header>
+    <ion-item *ngFor="let status of statusList$ | async">
+      <ng-container *ngIf="status">
+        <ion-avatar slot="start">
+          <img [src]="status.photo" />
+        </ion-avatar>
+        <ion-label>{{status.userName}} </ion-label>
+
+        <h5>{{status?.status}}</h5>
+      </ng-container>
+    </ion-item>
+  </ion-list>
+
+  <!--suppress HtmlUnknownTag, HtmlUnknownTag -->
+  <ion-list *ngIf="segment === 'calls'">
+    <ion-item>
+      <ion-label>Call 1</ion-label>
+      <!-- <ion-header>
+          <ion-toolbar>
+            <ion-title> video call </ion-title>
+          </ion-toolbar>
+        </ion-header> -->
+      <ion-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <video #localVideo autoplay playsinline muted></video>
+            </ion-col>
+            <ion-col>
+              <video #remoteVideo autoplay playsinline></video>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-content>
+    </ion-item>
+  </ion-list>
+
+  <ion-fab
+    slot="fixed"
+    horizontal="end"
+    vertical="bottom"
+    *ngIf="segment === 'chats'"
+  >
+    <ion-fab-button (click)="newChat()">
+      <ion-icon name="person-add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <ion-modal
+    #new_chat
+    [isOpen]="open_new_chat"
+    (willDismiss)="onWillDismiss($event)"
+  >
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>New Chat</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cancel()">Cancel</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content color="light" *ngIf="(users | async) as user$">
+        <ion-list
+          class="ion-margin-top"
+          [style.background]="'transparent'"
+          lines="none"
+        >
+          <app-userlist
+            *ngFor="let item of user$"
+            [item]="item"
+            (onClick)="startChat($event)"
+          >
+          </app-userlist>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+  <ion-fab
+    slot="fixed"
+    horizontal="end"
+    vertical="bottom"
+    *ngIf="segment === 'status'"
+  >
+    <ion-fab-button (click)="status()">
+      <ion-icon name="add-circle-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-modal
+    #statusModal
+    [isOpen]="open_new_status"
+    (willDismiss)="onStatusModalDismiss($event)"
+  >
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Update Status</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cancelStatusUpdate()">Cancel</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content color="light">
+        <ion-item>
+          <label>New Status</label>
+          <ion-textarea
+            [(ngModel)]="newStatus"
+            rows="4"
+            placeholder="Enter your new status here"
+          ></ion-textarea>
+        </ion-item>
+        <ion-button (click)="takePicture()">Take Picture</ion-button>
+        <ion-button (click)="uploadStatus(newStatus)">Upload Status</ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
+
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Chat</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon name="more_vert"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-tabs [(ngModel)]="selectedTabIndex" (ionChange)="onTabChange($event)">
+    <ion-tab-bar slot="bottom">
+      <ion-tab-button tab="status">
+        <ion-label>Status</ion-label>
+      </ion-tab-button>
+      <ion-tab-button tab="chats">
+        <ion-label>Chats</ion-label>
+      </ion-tab-button>
+      <ion-tab-button tab="calls">
+        <ion-label>Calls</ion-label>
+      </ion-tab-button>
+    </ion-tab-bar>
+  </ion-tabs>
+</ion-header>
+
+<ion-content>
+  <ng-container *ngIf="selectedTabIndex === 0">
+    <div class="status-tab-content">
+      <ion-list>
+        <ion-list-header>Status Updates</ion-list-header>
+        <ion-item *ngFor="let status of statusList$ | async">
+          <ion-avatar slot="start">
+            <img [src]="status.photo" alt="User Photo" />
+          </ion-avatar>
+          <ion-label>
+            <h2>{{ status.userName }}</h2>
+            <p>{{ status.status }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="selectedTabIndex === 1">
+    <div class="chats-tab-content">
+      <ion-list *ngIf="segment === 'chats' && (chatRooms$| async) as rooms">
+        <ion-list-header>Recent Chats</ion-list-header>
+        <app-empty-screen
+          *ngIf="rooms.length === 0"
+          [model]="model"
+        ></app-empty-screen>
+        <ion-item
+          *ngFor="let item of rooms"
+          (click)="getChat(item)"
+          detail="true"
+        >
+          <ion-avatar slot="start">
+            <img [src]="getUser(item.photo)" alt="user photo" />
+          </ion-avatar>
+          <ion-label>
+            <h2>{{ getUser(item)?.name }}</h2>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="selectedTabIndex === 2">
+    <div class="calls-tab-content">
+      <ion-list>
+        <ion-list-header>Video Call</ion-list-header>
+        <ion-item>
+          <div>
+            <video #localVideo autoplay playsinline muted></video>
+          </div>
+          <div>
+            <video #remoteVideo autoplay playsinline></video>
+          </div>
+        </ion-item>
+      </ion-list>
+    </div>
+  </ng-container>
+
+  <ion-fab
+    vertical="bottom"
+    horizontal="end"
+    slot="fixed"
+    *ngIf="selectedTabIndex === 1"
+  >
+    <ion-fab-button (click)="newChat()">
+      <ion-icon name="person_add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-modal *ngIf="open_new_chat" (backdropClick)="onWillDismiss($event)">
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>New Chat</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-list>
+        <app-userlist
+          *ngFor="let item of users | async"
+          [item]="item"
+          (onClick)="startChat($event)"
+        >
+        </app-userlist>
+      </ion-list>
+    </ion-content>
+    <ion-footer>
+      <ion-toolbar>
+        <ion-buttons slot="end">
+          <ion-button (click)="cancel()">Cancel</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-footer>
+  </ion-modal>
+
+  <ion-modal
+    *ngIf="open_new_status"
+    (backdropClick)="onStatusModalDismiss($event)"
+  >
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Update Status</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-item>
+        <ion-textarea
+          [(ngModel)]="newStatus"
+          rows="4"
+          placeholder="Enter your new status here"
+        ></ion-textarea>
+      </ion-item>
+      <ion-button (click)="takePicture()">Take Picture</ion-button>
+    </ion-content>
+    <ion-footer>
+      <ion-toolbar>
+        <ion-buttons slot="end">
+          <ion-button (click)="cancelStatusUpdate()">Cancel</ion-button>
+          <ion-button (click)="uploadStatus(newStatus)"
+            >Upload Status</ion-button
+          >
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-footer>
+  </ion-modal>
+</ion-content>

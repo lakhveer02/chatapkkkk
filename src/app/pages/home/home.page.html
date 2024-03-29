@@ -32,28 +32,78 @@
 </ion-header>
 
 <ion-content color="light">
-  <ion-list *ngIf="segment == 'chats' && (chatRooms | async) as rooms">
+  <ion-list *ngIf="segment === 'chats' && (chatRooms$ | async) as rooms">
     <ion-list-header class="ion-padding-bottom" color="light">
       RECENT CHATS
     </ion-list-header>
+    <app-empty-screen
+      *ngIf="rooms.length === 0"
+      [model]="model"
+    ></app-empty-screen>
     <ion-item
       *ngFor="let item of rooms"
       (click)="getChat(item)"
       [detail]="true"
     >
-      <ion-avatar slot="start">
-        <img [src]="item?.otherUser?.photo" />
-      </ion-avatar>
-      <ion-label> {{ item?.otherUser?.name || 'Unknown' }} </ion-label>
+      <ng-container *ngIf="item">
+        <ion-avatar slot="start">
+          <img [src]="getUser(item)?.photo" />
+        </ion-avatar>
+        <ion-label>{{ getUser(item)?.name }} </ion-label>
+      </ng-container>
     </ion-item>
   </ion-list>
 
-  <ion-fab slot="fixed" horizontal="end" vertical="bottom">
+  <ion-list *ngIf="segment ==='status' ">
+    <ion-list-header color="light">
+      <ion-label> Status Updates</ion-label>
+    </ion-list-header>
+    <ion-item *ngFor="let status of statusList$ | async">
+      <ng-container *ngIf="status">
+        <ion-avatar slot="start">
+          <img [src]="status.photo" />
+        </ion-avatar>
+        <ion-label>{{status.userName}} </ion-label>
+
+        <h5>{{status?.status}}</h5>
+      </ng-container>
+    </ion-item>
+  </ion-list>
+
+  <!--suppress HtmlUnknownTag, HtmlUnknownTag -->
+  <ion-list *ngIf="segment === 'calls'">
+    <ion-item>
+      <ion-label>Call 1</ion-label>
+      <!-- <ion-header>
+        <ion-toolbar>
+          <ion-title> video call </ion-title>
+        </ion-toolbar>
+      </ion-header> -->
+      <ion-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <video #localVideo autoplay playsinline muted></video>
+            </ion-col>
+            <ion-col>
+              <video #remoteVideo autoplay playsinline></video>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-content>
+    </ion-item>
+  </ion-list>
+
+  <ion-fab
+    slot="fixed"
+    horizontal="end"
+    vertical="bottom"
+    *ngIf="segment === 'chats'"
+  >
     <ion-fab-button (click)="newChat()">
       <ion-icon name="person-add-outline"></ion-icon>
     </ion-fab-button>
   </ion-fab>
-
   <ion-modal
     #new_chat
     [isOpen]="open_new_chat"
@@ -81,6 +131,45 @@
           >
           </app-userlist>
         </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+  <ion-fab
+    slot="fixed"
+    horizontal="end"
+    vertical="bottom"
+    *ngIf="segment === 'status'"
+  >
+    <ion-fab-button (click)="status()">
+      <ion-icon name="add-circle-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-modal
+    #statusModal
+    [isOpen]="open_new_status"
+    (willDismiss)="onStatusModalDismiss($event)"
+  >
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Update Status</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cancelStatusUpdate()">Cancel</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content color="light">
+        <ion-item>
+          <label>New Status</label>
+          <ion-textarea
+            [(ngModel)]="newStatus"
+            rows="4"
+            placeholder="Enter your new status here"
+          ></ion-textarea>
+        </ion-item>
+        <ion-button (click)="takePicture()">Take Picture</ion-button>
+        <ion-button (click)="uploadStatus(newStatus)">Upload Status</ion-button>
       </ion-content>
     </ng-template>
   </ion-modal>

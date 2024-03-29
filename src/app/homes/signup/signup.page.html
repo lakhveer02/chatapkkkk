@@ -1,105 +1,97 @@
-<ion-content [fullscreen]="true">
-  <ion-spinner
+<ion-content>
+  <!-- <ion-spinner
     class="ion-text-center"
     name="crescent"
     color="success"
     *ngIf="isLoading"
-  ></ion-spinner>
+  ></ion-spinner> -->
   <div class="circleBase type2 circle1"></div>
   <div class="circleBase type1"></div>
   <div class="circleBase type2 circle2"></div>
+  <mat-card>
+    <mat-card-title class="welcomeMessage">
+      <mat-label class="ion-text-center">
+        <div class="ion-text-center">
+          <span class="ion-text-center" style="color: rgb(7, 7, 7)"
+            >Hello,</span
+          >
+          <p class="ion-text-center" style="color: rgb(17, 16, 16)">Sign Up!</p>
+        </div>
+      </mat-label>
+    </mat-card-title>
+  </mat-card>
+  <mat-card>
+    <div class="backButton">
+      <mat-icon (click)="goBack()" color="white"
+        ><span class="material-symbols-outlined"> arrow_back </span></mat-icon
+      >
+    </div>
+  </mat-card>
+  <mat-card>
+    <mat-card-content>
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+        <mat-form-field class="ion-margin-vertical" appearance="fill">
+          <mat-icon matPrefix>people</mat-icon>
+          <input
+            formControlName="username"
+            matInput
+            placeholder="Enter Username"
+          />
+          <mat-error
+            *ngIf="signupForm.get('username')?.invalid && signupForm.get('username')?.touched"
+          >
+            <p *ngIf="signupForm.get('username')?.errors?.['required']">
+              *Please enter Username
+            </p>
+            <p *ngIf="signupForm.get('username')?.errors?.['minlength']">
+              *Name must be at least 3 characters long
+            </p>
+          </mat-error>
+        </mat-form-field>
 
-  <ion-label class="welcomeMessage">
-    <ion-text color="light">Hello,</ion-text>
-    <ion-text color="light">
-      <p>Sign Up!</p>
-    </ion-text>
-  </ion-label>
+        <mat-form-field class="ion-margin-vertical" appearance="fill">
+          <mat-icon matPrefix>email</mat-icon>
+          <input
+            formControlName="email"
+            matInput
+            placeholder="Enter Email Address"
+          />
+          <mat-error
+            *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched"
+          >
+            <p *ngIf="signupForm.get('email')?.errors?.['required']">
+              *Please enter Email Address
+            </p>
+            <p *ngIf="signupForm.get('email')?.errors?.['email']">
+              *Please enter a valid Email Address
+            </p>
+          </mat-error>
+        </mat-form-field>
 
-  <ion-icon
-    name="arrow-back-outline"
-    color="light"
-    class="backButton"
-    routerLink="/home"
+        <mat-form-field class="ion-margin-vertical" appearance="fill">
+          <mat-icon matPrefix>lock</mat-icon>
+          <input
+            [type]="isTypePassword ? 'password' : 'text'"
+            formControlName="password"
+            matInput
+            placeholder="Enter Password"
+          />
+          <mat-error
+            *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched"
+          >
+            <p *ngIf="signupForm.get('password')?.errors?.['required']">
+              *Please enter Password
+            </p>
+            <p *ngIf="signupForm.get('password')?.errors?.['minlength']">
+              *Password must be at least 8 characters long
+            </p>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-checkbox> I accept the policy and terms </mat-checkbox>
+
+        <button mat-raised-button color="primary" type="submit">Sign Up</button>
+      </form></mat-card-content
+    ></mat-card
   >
-  </ion-icon>
-
-  <form [formGroup]="signupForm">
-    <ion-list lines="none" class="ion-margin ion-padding ion-text-center">
-      <ion-item class="ion-margin-vertical">
-        <ion-icon name="person-outline" slot="end" color="medium"> </ion-icon>
-        <ion-input
-          formControlName="username"
-          placeholder="Enter Username"
-          autocomplete="off"
-        >
-        </ion-input>
-      </ion-item>
-      <ion-text
-        class="ion-text-left"
-        color="danger"
-        *ngIf="!signupForm.get('username')&& signupForm.get('username')?.touched"
-      >
-        <p class="error">*Please enter Username</p>
-      </ion-text>
-
-      <ion-item class="ion-margin-vertical">
-        <ion-icon name="mail-outline" slot="end" color="medium"> </ion-icon>
-        <ion-input
-          formControlName="email"
-          placeholder="Enter Email Address"
-          autocomplete="off"
-        >
-        </ion-input>
-      </ion-item>
-      <ion-text
-        class="ion-text-left"
-        color="danger"
-        *ngIf="!signupForm.get('email') && signupForm.get('email')"
-      >
-        <p class="error">*Please enter proper Email Address</p>
-      </ion-text>
-
-      <ion-item class="ion-margin-vertical">
-        <ion-icon
-          (click)="onChange()"
-          [name]="isTypePassword ? 'lock-closed-outline' : 'lock-open-outline'"
-          slot="end"
-          [color]="isTypePassword ? 'medium' : 'primary'"
-        >
-        </ion-icon>
-        <ion-input
-          formControlName="password"
-          [type]="isTypePassword ? 'password' : 'text'"
-          placeholder="Enter Password"
-          autocomplete="off"
-        >
-        </ion-input>
-      </ion-item>
-      <ion-text
-        class="ion-text-left"
-        color="danger"
-        *ngIf="!signupForm.get('password')?.invalid && signupForm.get('password')"
-      >
-        <p
-          class="error"
-          *ngIf="signupForm.get('password')?.invalid && signupForm.get('password') && signupForm.get('password')?.errors?.['required']"
-        ></p>
-
-        <p class="error" *ngIf="signupForm.get('password')?.dirty"></p>
-      </ion-text>
-
-      <ion-row class="ion-margin-vertical">
-        <ion-col size="12" class="alignItems">
-          <div align="left">
-            <ion-checkbox></ion-checkbox>
-            <ion-note>I accept the policy and terms</ion-note>
-          </div>
-        </ion-col>
-      </ion-row>
-      <ion-button color="primary" shape="round" (click)="onSubmit()"
-        >Sign Up</ion-button
-      >
-    </ion-list>
-  </form>
 </ion-content>

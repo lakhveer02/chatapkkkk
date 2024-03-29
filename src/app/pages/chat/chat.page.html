@@ -1,18 +1,20 @@
 <ion-header>
-  <ion-toolbar color="primary">
+  <mat-toolbar color="primary">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{name}}</ion-title>
-  </ion-toolbar>
+    <ion-title>{{ name }} </ion-title>
+  </mat-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-list lines="none" *ngIf="(chats) as chat$">
+  <app-empty-screen *ngIf="(chats | async)?.length===0" [model]="model">
+  </app-empty-screen>
+  <ion-list lines="none" *ngIf="(chats |async) as chat$">
     <ion-item-group class="chats-group" *ngFor="let chat of chat$">
       <app-chat-box
         [chat]="chat"
-        [current_user_id]="CurrentUserId"
+        [current_user_id]="chatService.currentUserId"
       ></app-chat-box>
     </ion-item-group>
   </ion-list>
@@ -42,3 +44,53 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-footer>
+<!-- 
+<mat-toolbar color="primary">
+  <mat-button-toggle-group name="fontStyle" aria-label="Font Style">
+    <mat-button-toggle value="a" (click)="goBack()">Back</mat-button-toggle>
+    <mat-button-toggle value="b" disableRipple>{{ name }}</mat-button-toggle>
+  </mat-button-toggle-group>
+</mat-toolbar>
+
+<mat-expansion-panel *ngIf="(chats | async)?.length ===0" hideToggle>
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      <app-empty-screen [model]="model"></app-empty-screen>
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+</mat-expansion-panel>
+
+<mat-accordion *ngIf="(chats |async) as chat$">
+  <mat-expansion-panel class="chats-group" *ngFor="let chat of chat$">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <app-chat-box
+          [chat]="chat"
+          [current_user_id]="chatService.currentUserId"
+        ></app-chat-box>
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+  </mat-expansion-panel>
+</mat-accordion>
+
+<mat-toolbar color="primary">
+  <textarea
+    matInput
+    autoGrow
+    rows="1"
+    placeholder="Send Message"
+    [(ngModel)]="message"
+  ></textarea>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="sendMessage()"
+    *ngIf="!isLoading"
+  >
+    Send
+    <mat-icon>send</mat-icon>
+  </button>
+  <button mat-raised-button color="primary" *ngIf="isLoading" disabled>
+    <mat-spinner size="24px" [diameter]="24"></mat-spinner>
+  </button>
+</mat-toolbar> -->

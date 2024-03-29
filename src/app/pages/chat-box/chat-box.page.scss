@@ -11,6 +11,7 @@ ion-item{
         padding: 4px 8px;
         margin-top: 12px;
         max-width: 70%;
+        min-width: 50%;
         ion-text{
             font-weight: 400;
             font-size: 0.9rem;
@@ -32,7 +33,7 @@ ion-item{
             padding: 4px 8px 4px 4px;
             line-height: 16px;
             pointer-events: auto;
-            color: var(--ion-color-medium);
+            color: var(--ion-color-dark);
         }
     }
 }
@@ -106,3 +107,105 @@ ion-item{
         }
     }
 }
+
+// .sender {
+//     align-items: flex-end;
+//     display: flex;
+//     flex-direction: row;
+  
+//     .avatar {
+//       color: var(--ion-color-medium);
+//       font-size: 2em;
+//       margin-right: 16px;
+//     }
+  
+//     .message {
+//       align-items: flex-end;
+//       background-color: rgba(255, 255, 255, 0.1);
+//       border-radius: 16px;
+//       display: flex;
+//       flex-direction: column;
+//       margin-left: 16px;
+//       padding: 12px;
+  
+//       .text {
+//         font-size: 1rem;
+//       }
+  
+//       .time {
+//         font-size: 0.8rem;
+//         margin-top: 4px;
+//       }
+  
+//       &.secondary {
+//         background-color: rgba(255, 255, 255, 0.05);
+  
+//         .icon {
+//           color: var(--ion-color-warning);
+//         }
+  
+//         .text {
+//           color: var(--ion-color-light);
+//         }
+  
+//         .time {
+//           color: var(--ion-color-medium);
+//         }
+//       }
+//     }
+  
+//     .icon {
+//       color: var(--ion-color-primary);
+//       height: 1em;
+//       width: 1em;
+//       margin-left: 12px;
+//     }
+  
+//     .divider {
+//       margin-top: 16px;
+//       margin-bottom: 16px;
+//     }
+//   }
+  
+//   .user {
+//     align-items: flex-start;
+//     display: flex;
+//     flex-direction: row;
+  
+//     .avatar {
+//       color: var(--ion-color-primary-contrast);
+//       font-size: 2em;
+//       margin-left: 16px;
+//     }
+  
+//     .message {
+//       align-items: flex-start;
+//       background-color: var(--ion-item-background);
+//       border-radius: 16px;
+//       display: flex;
+//       flex-direction: column;
+//       margin-right: 16px;
+//       padding: 12px;
+  
+//       .text {
+//         font-size: 1rem;
+//       }
+  
+//       .time {
+//         font-size: 0.8rem;
+//         margin-top: 4px;
+//       }
+  
+//       .icon {
+//         color: var(--ion-color-text-secondary);
+//         height: 1em;
+//         width: 1em;
+//         margin-left: 12px;
+//       }
+//     }
+  
+//     .divider {
+//       margin-top: 16px;
+//       margin-bottom: 16px;
+//     }
+//   }

@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
+import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from "@angular/router";
 import { Observable } from "rxjs";
 import { AuthService } from "src/app/services/auth/auth.service";
 
@@ -7,8 +7,7 @@ import { AuthService } from "src/app/services/auth/auth.service";
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-  constructor(private authService: AuthService, private router: Router) {}
-
+  constructor(private authService: AuthService, private router: Router) { }
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     return this.authService.cheakAuth().then(user => {
       if (user) {
@@ -18,7 +17,7 @@ export class AuthGuard implements CanActivate {
         return false;
       }
     }).catch(error => {
-      console.error('Error checking authentication:', error);
+      console.error('Error checking Authentication :', error);
       this.router.navigateByUrl('/login');
       return false;
     });

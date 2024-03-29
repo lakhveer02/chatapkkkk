@@ -1,16 +1,81 @@
-<ion-item lines="none" [class]="chat?.sender !=current_user_id?'sender':'user'">
+<ion-item
+  lines="none"
+  [class]="chat?.sender != current_user_id ? 'sender' : 'user'"
+>
   <ion-label
-    [slot]="chat?.sender===current_user_id?'end':'start'"
+    [slot]="chat?.sender === current_user_id ? 'end' : 'start'"
     class="ion-text-wrap"
   >
-    <ion-text> {{chat?.message}} </ion-text>
+    <ion-text>{{ chat?.message }}</ion-text>
     <ion-note>
-      <!-- <small>{{(chat?.createAt)?.toDate()|date: 'HH:mm'}}</small> -->
-      <small>10:00am</small>
+      <small>{{ (chat?.createdAt?.toDate() | date: ' HH:mm') }}</small>
       <ion-icon
-        [color]="chat?.sender===current_user_id?'light':'primary'"
+        [color]="chat?.sender === current_user_id ? 'light' : 'primary'"
         name="checkmark-done-outline"
       ></ion-icon>
     </ion-note>
   </ion-label>
 </ion-item>
+<!-- 
+<mat-list-item [class]="chat?.sender != current_user_id ? 'sender' : 'user'">
+  <mat-icon
+    *ngIf="chat?.sender !== current_user_id"
+    matListAvatar
+    class="avatar"
+  >
+    {{ chat?.sender?.charAt(0)?.toUpperCase() }}
+  </mat-icon>
+
+  <mat-icon
+    *ngIf="chat?.sender === current_user_id"
+    matListAvatar
+    class="avatar"
+    color="primary"
+  >
+    {{ chat?.sender?.charAt(0)?.toUpperCase() }}
+  </mat-icon>
+
+  <mat-divider
+    *ngIf="chat?.sender !== current_user_id"
+    class="divider"
+    [inset]="true"
+  ></mat-divider>
+
+  <mat-divider
+    *ngIf="chat?.sender === current_user_id"
+    class="divider"
+    [inset]="true"
+    [vertical]="true"
+  ></mat-divider>
+
+  <div
+    *ngIf="chat?.sender === current_user_id"
+    class="message"
+    matLine
+    [class.secondary]="!chat?.seen"
+  >
+    <div class="content">
+      <div class="text">{{ chat?.message }}</div>
+      <div class="time">
+        <small>{{ chat?.createdAt?.toDate() | date: 'HH:mm' }}</small>
+      </div>
+    </div>
+
+    <mat-icon *ngIf="!chat?.seen" color="warn" class="icon" matListItemIcon>
+      <mat-icon>warning</mat-icon>
+    </mat-icon>
+  </div>
+
+  <div *ngIf="chat?.sender !== current_user_id" class="message" matLine>
+    <div class="content">
+      <div class="text">{{ chat?.message }}</div>
+      <div class="time">
+        <small>{{ chat?.createdAt?.toDate() | date: 'HH:mm' }}</small>
+      </div>
+    </div>
+
+    <mat-icon *ngIf="chat?.seen" color="primary" class="icon">
+      checkmark_done_outline
+    </mat-icon>
+  </div>
+</mat-list-item> -->

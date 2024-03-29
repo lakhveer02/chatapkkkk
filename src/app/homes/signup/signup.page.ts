@@ -1,3 +1,4 @@
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,14 +9,20 @@ import { addIcons } from 'ionicons';
 import { AuthService } from 'src/app/services/auth/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import {lockClosedOutline,lockOpenOutline,mailOutline,personOutline,arrowBackOutline} from 'ionicons/icons';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import {MatIconModule}  from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+ 
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.page.html',
   styleUrls: ['./signup.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule,ReactiveFormsModule,RouterLink]
+  imports: [IonicModule, CommonModule, FormsModule,ReactiveFormsModule,RouterLink,MatFormFieldModule,MatInputModule,MatCheckboxModule,MatIconModule,MatCardModule]
 })
-export class SignupPage implements OnInit {
+export class SignupPage  {
 
   signupForm!: FormGroup;
   isTypePassword: boolean = true;
@@ -26,13 +33,10 @@ export class SignupPage implements OnInit {
     this.initForm();
   }
 
-  ngOnInit() {
-  }
-
   initForm() {
     this.signupForm = new FormGroup({
       username: new FormControl('', 
-        {validators: [Validators.required]}
+        {validators: [Validators.required,Validators.minLength(4)]}
       ),
       email: new FormControl('', 
         {validators: [Validators.required, Validators.email]}
@@ -79,6 +83,9 @@ export class SignupPage implements OnInit {
       buttons:['OK'],
     });
     await alert.present();
-  }
 
+  }
+  goBack() {
+    this.router.navigate(['/home']);
+  }
 }
